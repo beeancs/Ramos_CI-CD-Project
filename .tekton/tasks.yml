@@ -1,0 +1,28 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: cleanup
+spec:
+  workspaces:
+    - name: shared-workspace
+  steps:
+    - name: clean
+      image: alpine
+      script: |
+        rm -rf /workspace/shared-workspace/.pytest_cache || true
+
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: nose-tests
+spec:
+  workspaces:
+    - name: shared-workspace
+  steps:
+    - name: test
+      image: python:3.11
+      workingDir: /workspace/shared-workspace
+      script: |
+        pip install nose
+        nosetests -v
